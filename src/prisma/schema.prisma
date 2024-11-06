@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+ 
+model Contact {
+  id           String   @id @default(cuid())
+  first_name   String
+  last_name    String
+  email        String
+  phone_number String
+  project_info String
+  objective    Objective
+
+  archived     Boolean  @default(false)
+  read_at      DateTime? // Marks when the contact was last read
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+}
+
+model Review {
+  id               String   @id @default(cuid())
+  business_name    String
+  website_type     String
+  rating           Int
+  summary          String
+  favorite_feature String?
+  improvements     String?
+
+  archived         Boolean  @default(false)
+  read_at          DateTime? // Marks when the review was last read
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+}
+
+enum Objective {
+  fresh
+  elevate
+  other
+}
+
+model FCMToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  email     String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
