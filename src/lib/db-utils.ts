@@ -138,3 +138,14 @@ export const markAllAsRead = async () => {
     }
   })
 }
+
+export const checkTokenEnabled = async( token: string ) => {
+  return (await prisma.fCMToken.findUnique({ where: { token } }))?.active as boolean
+}
+
+export const togglePushNotifications = async (active: boolean, token: string) => {
+  await prisma.fCMToken.update({
+    where: { token },
+    data: { active }
+  })
+}

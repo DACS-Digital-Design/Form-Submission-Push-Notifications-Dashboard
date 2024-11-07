@@ -1,7 +1,7 @@
 "use client"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LoadingButton } from "@/components/ui/loading-button";
-import { markAllAsRead, toggleEntryRead } from "@/lib/db";
+import { markAllAsRead, toggleEntryRead } from "@/lib/db-utils";
 import { capitalizeFirstLetter, cn } from "@/lib/utils";
 import { ProviderContext } from "@/components/provider";
 import { LoadingState } from "@/components/states";
@@ -57,7 +57,7 @@ const NotificationsPage = () => {
       ) : (
         <main className="flex-grow p-2 transition-all overflow-y-auto container">
           {notifications.map((notification) => (
-            <Card key={`notif-${notification.type}-${notification.id}`} className={cn("mb-3 bg-white/10", notification.read_at && 'bg-white/5 opaicty-50 [&_*]:text-white/50')}>
+            <Card key={`notif-${notification.type}-${notification.id}`} className={cn("mb-3 bg-white/10", notification.read_at && 'bg-white/5 opaicty-50 [&_*]:text-foreground/50')}>
               <CardHeader className="p-3">
                 <CardTitle className="flex items-center justify-between text-sm">
                   New {capitalizeFirstLetter(notification.type)} form submission

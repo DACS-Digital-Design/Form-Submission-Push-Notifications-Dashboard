@@ -1,8 +1,13 @@
 "use client"
 
-import { Contact, Review } from "@/app/page";
-import { fetchContacts, fetchNotifications, fetchReviews, Notification } from "@/lib/db";
+import { checkTokenEnabled, fetchContacts, fetchNotifications, fetchReviews } from "@/lib/db-utils";
 import { createContext, ReactNode, useEffect, useState } from "react";
+import { Contact, Review } from "@/app/page";
+import type { Notification } from "@/lib/db-utils";
+import { ThemeProvider } from "next-themes";
+import { fetchToken } from "@/firebase";
+import { Session } from "next-auth";
+import { db, defaultSettings, Settings } from "@/db";
 
 export const ProviderContext = createContext({
   notifications: [{
@@ -38,35 +43,35 @@ export const ProviderContext = createContext({
     created_at: new Date(),
     updated_at: new Date(),
   } as Review],
-  fetchData: (dataToFetch: ("notifications" | "contacts" | "reviews"| "cookies")[] | "all" ) => {},
-  cookies: [{
-    key: "",
-    value: ""
-  }],
-  loading: true
+  fetchData: async (dataToFetch: ("notifications" | "contacts" | "reviews"| "settings" | "token")[] | "all" ) => {},
+  settings: defaultSettings,
+  loading: true,
+  session: null as Session | null,
 })
 
-export const Provider = ({ children }: { children: ReactNode }) => {
+export const Provider = ({ children, session }: { children: ReactNode, session: Session | null }) => {
   const [loading, setLoading] = useState<boolean>(true);
 
+  const [settings, setSettings] = useState<Settings>(defaultSettings);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [cookies, setCookies] = useState<{ key: string, value: string }[]>([]);
 
   useEffect(() => {
-    setLoading(true);
+    (async() => {
+      setLoading(true);
 
-    if (document && document.cookie) {
-      setCookies(
-        document.cookie.split('; ').join().split(',').map(cookie => cookie.split('=')).map(([key, value]) => ({ key, value }))
-      )
-    }
+      setSettings(await db.getSettings())
 
-    setLoading(false);
+      setLoading(false);
+    })()
   }, [])
 
-  const fetchData = async ( dataToFetch: ("notifications" | "contacts" | "reviews"| "cookies")[] | "all" ) => {
+  useEffect(() => {
+    uploadToken()
+  }, [session, settings.token])
+
+  const fetchData = async ( dataToFetch: ("notifications" | "contacts" | "reviews"| "settings" | "token")[] | "all" ) => {
     setLoading(true);
 
     if (dataToFetch === "all" || dataToFetch.includes("notifications")) {
@@ -78,15 +83,28 @@ export const Provider = ({ children }: { children: ReactNode }) => {
     if (dataToFetch === "all" || dataToFetch.includes("reviews")) {
       setReviews(await fetchReviews());
     }
-    if (dataToFetch === "all" || dataToFetch.includes("cookies")) {
-      if (document && document.cookie) {
-        setCookies(
-          document.cookie.split('; ').join().split(',').map(cookie => cookie.split('=')).map(([key, value]) => ({ key, value }))
-        )
-      }
+    if (dataToFetch === "all" || dataToFetch.includes("settings")) {
+      setSettings(await db.getSettings())
+    }
+    if (dataToFetch === "all" || dataToFetch.includes("token")) {
+      await db.updateSettings({ token: await fetchToken() });
     }
 
     setLoading(false);
+  }
+
+  const uploadToken = async () => {
+    // If cookies have been fetched and a token exists, or if we're not logged in, return
+    if (!session) return;
+
+    if (Notification.permission === 'granted') {
+      if (!settings.token) return await fetchData(['token']);
+
+      fetch('/api/upload-token', {
+        method: 'POST',
+        body: JSON.stringify({ token: settings.token, email: session?.user?.email }),
+      })
+    }
   }
 
   return (
@@ -96,11 +114,17 @@ export const Provider = ({ children }: { children: ReactNode }) => {
         contacts,
         reviews,
         fetchData,
-        cookies,
-        loading
+        settings,
+        loading,
+        session,
       }}
     >
-      {children}
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="dark"
+      >
+        {children}
+      </ThemeProvider>
     </ProviderContext.Provider>
   );
 }

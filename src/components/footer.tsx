@@ -1,5 +1,5 @@
 "use client"
-import { Bell, Home, User } from "lucide-react";
+import { Bell, Home, Settings, User } from "lucide-react";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import Link from "next/link";
@@ -33,12 +33,12 @@ const Footer = () => {
             )}
           </Button>
         </Link>
-        {/* <Link href="/profile"> */}
-          <Button variant="ghost" className={cn("flex flex-col items-center h-auto w-full", path === '/profile' && 'bg-accent')}>
-            <User className="size-6" />
-            <span className="text-xs leading-[8px]">Profile</span>
+        <Link href="/settings">
+          <Button variant="ghost" className={cn("flex flex-col items-center h-auto w-full", path === '/settings' && 'bg-accent')}>
+            <Settings className="size-6" />
+            <span className="text-xs leading-[8px]">Settings</span>
           </Button>
-        {/* </Link> */}
+        </Link>
       </nav>
     </footer>
   );

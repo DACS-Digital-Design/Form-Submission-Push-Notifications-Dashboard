@@ -3,14 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Star, Archive, ArchiveRestore, ArrowUpDown } from 'lucide-react';
 import { LoadingButton } from "@/components/ui/loading-button";
-import { archiveContacts, archiveReviews } from '@/lib/db';
+import { archiveContacts, archiveReviews } from '@/lib/db-utils';
 import { ProviderContext } from "@/components/provider";
 import { LoadingState } from "@/components/states";
 import { useContext, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { AsYouType } from "libphonenumber-js";
-import { setCookie } from "@/lib/cookies";
 import { cn } from "@/lib/utils";
+import { db } from "@/db";
 
 export type Contact = {
   id: string
@@ -59,14 +59,14 @@ function sortReviews(reviews: Review[], sortOrder: 'asc' | 'desc', showArchived:
 }
 
 export default function HomePage() {
-  const { contacts, reviews, cookies, fetchData, loading } = useContext(ProviderContext)
+  const { contacts, reviews, settings, fetchData, loading } = useContext(ProviderContext)
 
   useEffect(() => {
-    fetchData(["contacts", "reviews", "cookies"])
+    fetchData(["contacts", "reviews", "settings"])
   }, [])
 
-  const sortOrder = cookies.find(cookie => cookie.key === 'sort')?.value === 'oldest' ? 'asc' : 'desc'
-  const showArchived = cookies.find(cookie => cookie.key === 'archived')?.value === 'true' || false
+  const sortOrder = settings.sortOrder
+  const showArchived = settings.showArchived
 
   const sortedContacts = sortContacts(contacts, sortOrder, showArchived)
   const sortedReviews = sortReviews(reviews, sortOrder, showArchived)
@@ -111,8 +111,8 @@ export default function HomePage() {
                     size="icon"
                     className="text-xs size-9 shrink-0"
                     onClick={async () => {
-                      await setCookie('sort', sortOrder === 'asc' ? 'newest' : 'oldest')
-                      fetchData(['cookies'])
+                      await db.updateSettings({ sortOrder: sortOrder === 'asc' ? 'desc' : 'asc' })
+                      fetchData(['settings'])
                       return true
                     }}
                   >
@@ -124,8 +124,8 @@ export default function HomePage() {
                     size="icon"
                     className="text-xs size-9 shrink-0"
                     onClick={async () => {
-                      await setCookie('archived', showArchived ? 'false' : 'true')
-                      fetchData(['cookies'])
+                      await db.updateSettings({ showArchived: !showArchived })
+                      fetchData(['settings'])
                       return true
                     }}
                   >

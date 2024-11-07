@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    return NextResponse.json({ success: true, message: "Uploaded FCM Token!" });
+    return NextResponse.json({ success: true, message: "Uploaded FCM Token!", token });
   } catch (error) {
     console.error(error)
     return NextResponse.json({ success: false, error });
