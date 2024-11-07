@@ -119,7 +119,9 @@ export async function POST(req: NextRequest) {
   try {
     await prisma.contact.create({ data });
 
-    const tokens = await prisma.fCMToken.findMany()
+    const tokens = await prisma.fCMToken.findMany({
+      where: { active: true }
+    })
     const payload: MulticastMessage = {
       tokens: tokens.map((t) => t.token),
       notification: {
