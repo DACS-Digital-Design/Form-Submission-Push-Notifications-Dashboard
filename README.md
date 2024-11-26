@@ -101,6 +101,7 @@ Configure the following environment variables in your `.env` file:
 - **Firebase:**
   - `NEXT_PUBLIC_FIREBASE_FCM_VAPID_KEY`: VAPID key for **Firebase FCM**.
   - `NEXT_PUBLIC_CLIENT_ID`: Public identifier for the specific client.
+  - `NEXT_PUBLIC_BASE_URL`: Base URL for current environment (https://localhost:3000/ or https://example.com/)
   - `NEXT_PUBLIC_FIREBASE_API_KEY`: Firebase API Key.
   - `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`: Firebase Auth Domain.
   - `NEXT_PUBLIC_FIREBASE_PROJECT_ID`: Firebase Project ID.
@@ -114,6 +115,7 @@ Configure the following environment variables in your `.env` file:
 ```env
 DATABASE_URL=your_postgresql_connection_string
 NEXT_PUBLIC_CLIENT_ID=current_client_id
+NEXT_PUBLIC_BASE_URL=current_path
 
 AUTH_SECRET=your_auth_secret_key
 AUTH_GOOGLE_ID=your_google_oauth_client_id
@@ -129,6 +131,58 @@ NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_firebase_messaging_sender_id
 NEXT_PUBLIC_FIREBASE_APP=your_firebase_app_name
 NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=your_firebase_measurement_id
 ```
+
+## Sensitive Configuration Files
+
+Two important files are excluded from version control (`.gitignore`) to protect sensitive information. These files must be created manually based on your Firebase configuration:
+
+### `firebase-config.json`
+
+This file holds the Firebase configuration:
+
+```json
+{
+  "apiKey": "",
+  "authDomain": "",
+  "projectId": "",
+  "storageBucket": "",
+  "messagingSenderId": "",
+  "appId": "",
+  "measurementId": ""
+}
+```
+
+### `src/service_key.json`
+
+This file contains Firebase service account credentials for server-side operations:
+
+```json
+{
+  "type": "",
+  "project_id": "",
+  "private_key_id": "",
+  "private_key": "",
+  "client_email": "",
+  "client_id": "",
+  "auth_uri": "",
+  "token_uri": "",
+  "auth_provider_x509_cert_url": "",
+  "client_x509_cert_url": "",
+  "universe_domain": ""
+}
+```
+
+---
+
+### How to Obtain These Files
+
+For detailed steps to generate these files, refer to:
+- [Firebase Tutorial Repository](https://github.com/Dulajdeshan/nextjs-firebase-messaging)
+- [A YouTube video](https://youtu.be/W-rlFj0d0RQ?si=jL8q4CyqPZCEox1C) tutorial explaining the setup process
+
+These resources will guide you through retrieving the `firebase-config.json` and `service_key.json` files from the Firebase Console.
+
+---
 
 ## Installation
 

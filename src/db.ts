@@ -12,7 +12,7 @@ export type Settings = {
 
 export const defaultSettings: Settings = {
   id: 1,
-  sortOrder: 'asc',
+  sortOrder: 'desc',
   showArchived: false,
   theme: 'dark',
   notificationsEnabled: true,

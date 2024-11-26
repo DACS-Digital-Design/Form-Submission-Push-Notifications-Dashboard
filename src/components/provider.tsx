@@ -69,6 +69,7 @@ export const Provider = ({ children, session }: { children: ReactNode, session: 
     }
     if (dataToFetch === "all" || dataToFetch.includes("token")) {
       await db.updateSettings({ token: await fetchToken() });
+      setSettings(await db.getSettings())
     }
 
     setLoading(false);
@@ -79,7 +80,7 @@ export const Provider = ({ children, session }: { children: ReactNode, session: 
     if (!session) return;
 
     if (Notification.permission === 'granted') {
-      if (!settings.token) return await fetchData(['token']);
+      if (!settings.token) return fetchData(['token', 'settings']);
 
       fetch('/api/upload-token', {
         method: 'POST',
