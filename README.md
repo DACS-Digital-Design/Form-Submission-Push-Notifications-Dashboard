@@ -102,13 +102,6 @@ Configure the following environment variables in your `.env` file:
   - `NEXT_PUBLIC_FIREBASE_FCM_VAPID_KEY`: VAPID key for **Firebase FCM**.
   - `NEXT_PUBLIC_CLIENT_ID`: Public identifier for the specific client.
   - `NEXT_PUBLIC_BASE_URL`: Base URL for current environment (https://localhost:3000/ or https://example.com/)
-  - `NEXT_PUBLIC_FIREBASE_API_KEY`: Firebase API Key.
-  - `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`: Firebase Auth Domain.
-  - `NEXT_PUBLIC_FIREBASE_PROJECT_ID`: Firebase Project ID.
-  - `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`: Firebase Storage Bucket.
-  - `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`: Firebase Messaging Sender ID.
-  - `NEXT_PUBLIC_FIREBASE_APP`: Firebase App Name.
-  - `NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID`: Firebase Measurement ID.
 
 ### Example `.env` File:
 
@@ -123,13 +116,6 @@ AUTH_GOOGLE_SECRET=your_google_oauth_client_secret
 
 NEXT_PUBLIC_FIREBASE_FCM_VAPID_KEY=your_firebase_vapid_key
 NEXT_PUBLIC_CLIENT_ID=your_client_id
-NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_firebase_project_id
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_firebase_storage_bucket
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_firebase_messaging_sender_id
-NEXT_PUBLIC_FIREBASE_APP=your_firebase_app_name
-NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=your_firebase_measurement_id
 ```
 
 ## Sensitive Configuration Files

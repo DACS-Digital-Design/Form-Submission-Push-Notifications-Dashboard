@@ -1,12 +1,12 @@
 "use client"
-import { Bell, Home, Settings, User } from "lucide-react";
+import { Bell, Home, Settings } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { ProviderContext } from "./provider";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
 import { useContext } from "react";
-import { ProviderContext } from "./provider";
+import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 const Footer = () => {
   const { notifications } = useContext(ProviderContext)
