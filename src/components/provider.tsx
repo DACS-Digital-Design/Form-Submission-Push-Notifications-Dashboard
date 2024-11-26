@@ -62,7 +62,15 @@ export const Provider = ({ children, session }: { children: ReactNode, session: 
       setNotifications(await fetchNotifications());
     }
     if (dataToFetch === "all" || dataToFetch.includes("contacts")) {
-      setContacts(await fetchContacts());
+      // Fetch data from the database, if empty, fetch cached data from IndexedDB
+      let data = await fetchContacts()
+      if (data.length === 0) data = (await db.getSettings()).entries
+
+      // Set the contacts state only if data is not empty
+      if (data.length > 0) await db.updateSettings({ entries: data });
+      
+      // Return the data to the state
+      setContacts(data);
     }
     if (dataToFetch === "all" || dataToFetch.includes("settings")) {
       setSettings(await db.getSettings())

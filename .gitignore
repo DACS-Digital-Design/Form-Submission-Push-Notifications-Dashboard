@@ -29,6 +29,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Not sure if these are safe to push or not so imma leave them out and let them out generate
+public/sw.js
+public/workbox-*.js
+
 # local env files
 .env*.local
 .env

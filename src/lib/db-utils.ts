@@ -35,11 +35,16 @@ const parseContacts = (contacts: (basicEntry & { content: string })[]) => {
 }
 
 export const fetchContacts = async (): Promise<ContactEntry[]> => {
-  return parseContacts(await prisma.entry.findMany({
-    where: {
-      client_id: process.env.NEXT_PUBLIC_CLIENT_ID as string
-    }
-  }))
+  try {
+    return parseContacts(await prisma.entry.findMany({
+      where: {
+        client_id: process.env.NEXT_PUBLIC_CLIENT_ID as string
+      }
+    }))
+  } catch (error) {
+    console.error(await error);
+    return []
+  }
 }
 
 export const archiveContacts = async (entryIDs: string[], archived: boolean) => {

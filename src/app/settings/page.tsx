@@ -17,14 +17,14 @@ const normalizeName = (name: string) => {
 }
 
 const SettingsPage = () => {
-  const { fetchData, settings } = useContext(ProviderContext);
+  const { fetchData, settings, loading } = useContext(ProviderContext);
   const { session } = useContext(ProviderContext);
-  const [ loading, setLoading ] = useState(true);
+  const [ loadingState, setLoadingState ] = useState(true);
   const { setTheme } = useTheme();
   
   useEffect(() => {
     fetchData(['token', 'settings'])
-    setLoading(false)
+    setLoadingState(false)
   }, [])
 
 
@@ -67,8 +67,8 @@ const SettingsPage = () => {
                   <span className="text-sm font-medium">Dark Mode</span>
                 </div>
                 <Switch
-                  disabled={loading}
-                  checked={(!session || !settings.token) ? false : settings.theme === 'dark'}
+                  disabled={loadingState}
+                  checked={loading ? false : settings.theme === 'dark'}
                   onCheckedChange={async() => {
                     setTheme(settings.theme === 'dark' ? 'light' : 'dark')
                     await db.updateSettings({ theme: settings.theme === 'dark' ? 'light' : 'dark' })

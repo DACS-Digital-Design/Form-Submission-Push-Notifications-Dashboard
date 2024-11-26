@@ -1,16 +1,16 @@
 "use client"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { Archive, ArchiveRestore, ArrowUpDown } from 'lucide-react';
 import { LoadingButton } from "@/components/ui/loading-button";
 import { archiveContacts, ContactEntry } from '@/lib/db-utils';
 import { capitalizeFirstLetter, cn } from "@/lib/utils";
 import { ProviderContext } from "@/components/provider";
 import { LoadingState } from "@/components/states";
-import { useCallback, useContext, useEffect, useState } from "react";
-import { AsYouType } from "libphonenumber-js";
-import { db } from "@/db";
-import { getToken } from "firebase/messaging";
 import { Button } from "@/components/ui/button";
+import { AsYouType } from "libphonenumber-js";
+import { getToken } from "firebase/messaging";
+import { db } from "@/db";
 
 function sortContacts(contacts: ContactEntry[], sortOrder: 'asc' | 'desc', showArchived: boolean) {
   return contacts

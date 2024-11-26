@@ -38,5 +38,5 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     authorized: async ({ auth }) => {
       return !!auth
     },
-  }
+  },
 })

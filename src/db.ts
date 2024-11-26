@@ -1,4 +1,5 @@
 import Dexie, { Table } from 'dexie';
+import { ContactEntry } from './lib/db-utils';
 
 // Define the type for settings
 export type Settings = {
@@ -8,6 +9,7 @@ export type Settings = {
   theme: 'light' | 'dark';
   notificationsEnabled: boolean;
   token: string | null;
+  entries: ContactEntry[];
 };
 
 export const defaultSettings: Settings = {
@@ -16,7 +18,8 @@ export const defaultSettings: Settings = {
   showArchived: false,
   theme: 'dark',
   notificationsEnabled: true,
-  token: null
+  token: null,
+  entries: [],
 }
 
 // Define the database class
