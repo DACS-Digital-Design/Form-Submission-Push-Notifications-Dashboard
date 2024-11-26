@@ -1,43 +1,55 @@
 "use server"
 
-import { Contact } from "@/app/page";
 import prisma from "@/prisma/client";
 
-export const fetchContacts = async (): Promise<Contact[]> => {
-  return await prisma.contact.findMany({})
+type basicEntry = {
+  id: string
+  client_id: string
+  archived: boolean
+  read_at: Date | null
+  created_at: Date
+  updated_at: Date
+}
+
+type Contact = {
+  name: string
+  email: string
+  phone: string
+  message: string
+}
+
+export type ContactEntry = basicEntry & Contact
+
+const parseContacts = (contacts: (basicEntry & { content: string })[]) => {
+  return contacts.map((contact) => {
+    return {
+      id: contact.id,
+      client_id: contact.client_id,
+      archived: contact.archived,
+      read_at: contact.read_at,
+      created_at: contact.created_at,
+      updated_at: contact.updated_at,
+      ...(JSON.parse(contact.content)) as Contact
+    }
+  }) as ContactEntry[]
+}
+
+export const fetchContacts = async (): Promise<ContactEntry[]> => {
+  return parseContacts(await prisma.entry.findMany({
+    where: {
+      client_id: process.env.NEXT_PUBLIC_CLIENT_ID as string
+    }
+  }))
 }
 
 export const archiveContacts = async (entryIDs: string[], archived: boolean) => {
   try {
-    await prisma.contact.updateMany({
+    await prisma.entry.updateMany({
       where: {
         id: {
           in: entryIDs
-        }
-      },
-      data: {
-        archived
-      }
-    })
-
-    return true;
-  } catch (error) {
-    console.error(false);
-    return false;
-  }
-}
-
-export const fetchReviews = async () => {
-  return await prisma.review.findMany({})
-}
-
-export const archiveReviews = async (entryIDs: string[], archived: boolean) => {
-  try {
-    await prisma.review.updateMany({
-      where: {
-        id: {
-          in: entryIDs
-        }
+        },
+        client_id: process.env.NEXT_PUBLIC_CLIENT_ID as string
       },
       data: {
         archived
@@ -54,84 +66,52 @@ export const archiveReviews = async (entryIDs: string[], archived: boolean) => {
 export type Notification = {
   id: string
   name: string
-  type: "contact" | "review"
   created_at: Date
-  read_at?: Date
+  read_at: Date | null
 }
 
 export const fetchNotifications = async () => {
   const notifs: Notification[] = []
 
-  const contacts = await prisma.contact.findMany({
+  const contacts = parseContacts(await prisma.entry.findMany({
+    where: {
+      client_id: process.env.NEXT_PUBLIC_CLIENT_ID as string,
+    },
     orderBy: {
       created_at: 'desc'
     },
-    take: 5
-  })
+    take: 10
+  }))
   contacts.forEach((contact) => {
     notifs.push({
       id: contact.id,
-      name: `${contact.first_name} ${contact.last_name}`,
+      name: contact.name,
       type: "contact",
       created_at: contact.created_at,
       read_at: contact.read_at
     } as Notification)
   })
 
-  const reviews = await prisma.review.findMany({
-    orderBy: {
-      created_at: 'desc'
-    },
-    take: 5
-  })
-  reviews.forEach((review) => {
-    notifs.push({
-      id: review.id,
-      name: review.business_name,
-      type: "review",
-      created_at: review.created_at,
-      read_at: review.read_at
-    } as Notification)
-  })
-
   return notifs.sort((a, b) => b.created_at.getTime() - a.created_at.getTime())
 }
 
-export const toggleEntryRead = async ( id: string, type: "contact" | "review", markAsRead: boolean ) => {
-  if (type === "contact") {
-    await prisma.contact.update({
-      where: {
-        id
-      },
-      data: {
-        read_at: markAsRead ? new Date() : null
-      }
-    })
-  } else {
-    await prisma.review.update({
-      where: {
-        id
-      },
-      data: {
-        read_at: markAsRead ? new Date() : null
-      }
-    })
-  }
+export const toggleEntryRead = async ( id: string, markAsRead: boolean ) => {
+  await prisma.entry.update({
+    where: {
+      id,
+      client_id: process.env.NEXT_PUBLIC_CLIENT_ID as string
+    },
+    data: {
+      read_at: markAsRead ? new Date() : null
+    }
+  })
 }
 
 export const markAllAsRead = async () => {
-  await prisma.contact.updateMany({
+  await prisma.entry.updateMany({
     where: {
-      read_at: null
-    },
-    data: {
-      read_at: new Date()
-    }
-  })
-
-  await prisma.review.updateMany({
-    where: {
-      read_at: null
+      read_at: null,
+      client_id: process.env.NEXT_PUBLIC_CLIENT_ID as string
     },
     data: {
       read_at: new Date()

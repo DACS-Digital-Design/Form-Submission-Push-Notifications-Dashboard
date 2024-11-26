@@ -2,9 +2,9 @@ import type { MetadataRoute } from 'next'
  
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'DACS Form Panel',
-    short_name: 'DACS Form',
-    description: 'DACS Digital Design contact form viewer',
+    name: 'Form Panel',
+    short_name: 'Forms',
+    description: 'Contact form Viewer',
     start_url: '/',
     display: 'standalone',
     background_color: '#282828',

@@ -9,7 +9,8 @@ export async function POST(request: NextRequest) {
       where: { token },
       create: {
         email,
-        token
+        token,
+        client_id: process.env.NEXT_PUBLIC_CLIENT_ID as string
       },
       update: {
         email,

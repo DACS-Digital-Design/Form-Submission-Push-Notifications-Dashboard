@@ -1,177 +1,168 @@
-# Website Request PWA
+# Form Viewer PWA Template
 
-This is a mobile-based Progressive Web App (PWA) built with Next.js 14 and a range of modern technologies. The app is designed to streamline website requests, saving them to a database and notifying registered devices using Firebase Cloud Messaging (FCM) when a request is made. 
+This repository contains a **Progressive Web App (PWA)** template designed to streamline form management for freelancers working with multiple clients. Built with cutting-edge technologies like **Next.js**, **Tailwind CSS**, **shadcn**, **Prisma**, **PostgreSQL**, **Auth.js**, **TypeScript**, and **Firebase**, this project serves as a mobile-friendly dashboard for tracking, viewing, and managing form submissions.
+
+## Purpose
+
+The **Form Viewer PWA Template** is tailored for freelancers who manage websites for multiple clients. Its primary use case is to act as a centralized dashboard for handling form submissions across clients' websites. The app supports:
+
+1. **Seamless Integration:** Client websites send `POST` requests to the `/api/submit-form` route with form data.
+2. **Data Organization:** Form submissions are stored in a **PostgreSQL database** with clear schema separation for each client.
+3. **Push Notifications:** With **Firebase Cloud Messaging (FCM)** integration, freelancers receive real-time notifications for new submissions.
+4. **Ease of Access:** A responsive and dynamic UI for reviewing, managing, and organizing form data.
 
 ## Tech Stack
 
-- **Next.js 14** - Framework for the PWA, providing SSR and API handling.
-- **Shadcn UI** - Component library for a responsive, cohesive design.
-- **Tailwind CSS** - Utility-first CSS framework for styling.
-- **Prisma** - ORM for database handling.
-- **Firebase** - Backend services for push notifications.
-- **Auth.js** - For handling authentication.
-- **TypeScript** - Type safety across the app.
+- **Frontend & Backend:** [Next.js](https://nextjs.org/)
+- **Styling:** [Tailwind CSS](https://tailwindcss.com/) and [shadcn](https://shadcn.dev/)
+- **Database & ORM:** [PostgreSQL](https://www.postgresql.org/) with [Prisma](https://www.prisma.io/)
+- **Authentication:** [Auth.js](https://authjs.dev/) with Google OAuth integration
+- **Programming Language:** [TypeScript](https://www.typescriptlang.org/)
+- **Push Notifications:** [Firebase Cloud Messaging (FCM)](https://firebase.google.com/docs/cloud-messaging)
 
-## Features
+## Key Features
 
-- **Database Integration**: Automatically saves all website requests to the database using Prisma.
-- **Push Notifications**: Sends push notifications to registered devices when a new request is submitted (set up with Firebase Cloud Messaging).
-- **Mobile-Friendly**: Optimized for mobile experience, PWA ready.
+- **Dynamic Data Handling:** 
+  - Form submissions are appended to the database under the following schema:
 
-## Quick Setup Guide
+    ```prisma
+    model Entry {
+      id         String   @id @default(cuid())
+      content    String   @unique // JSON string
+      client_id  String
+      archived   Boolean  @default(false)
+      read_at    DateTime?
+      created_at DateTime @default(now())
+      updated_at DateTime @default(now()) @updatedAt
+    }
+    ```
 
-### Prerequisites
+  - Each form entry contains:
+    - `client_id`: Identifies which client the submission belongs to.
+    - `content`: A stringified JSON object of the submitted data.
+    - Other metadata to track state and timestamps.
 
-- Node.js (v16+)
-- A Firebase project with FCM enabled
-- A PostgreSQL or other database for Prisma (make sure to update your `.env` with the correct database URL)
+- **Type-Safe Conversions:** Functions are provided to parse and convert `content` into type-safe variables and arrays for streamlined usage.
+- **Data Protections:** Built-in safeguards prevent accidental editing or modification of the wrong entries.
+- **Push Notification Setup:** This project integrates Firebase for sending notifications based on submission events, making client management more efficient.
 
-### Getting Started
+## Workflow for Freelancers
 
-1. **Clone the repository**
+1. **Setup:** Deploy this PWA and set up client IDs for each of your customers.
+2. **Integration:** Add the `/api/submit-form` endpoint to your clients' websites. Ensure their forms send `POST` requests with relevant data.
+3. **Data Management:** Access submissions in the app, sorted by client. Use the UI to mark submissions as read, archive them, or process them further.
+4. **Notifications:** Stay updated with real-time push notifications for new submissions.
+5. **Efficiency:** Use the type-safe parsing utilities to handle data without errors.
 
+## How It Works
+
+1. **Form Submission:**
+   - A client's website sends a `POST` request to `/api/submit-form` with the form data as a JSON payload.
+   - Example Payload:
+
+     ```json
+     {
+       "client_id": "client123",
+       "form_data": {
+         "name": "John Doe",
+         "email": "john@example.com",
+         "phone": "(123) 456-7890",
+         "message": "Hello!"
+       }
+     }
+     ```
+
+2. **Database Storage:**
+   - The server appends the form data to the `Entry` model in the database:
+     - `client_id` maps the entry to the correct client.
+     - `content` stores the stringified JSON object of the form data.
+
+3. **Data Display:**
+   - The frontend parses and displays form entries dynamically for easy viewing and management.
+
+4. **Notifications:**
+   - Using Firebase Cloud Messaging (FCM), push notifications alert you to new submissions.
+
+## Prerequisites
+
+### Required Environment Variables
+
+Configure the following environment variables in your `.env` file:
+
+- **Database:**
+  - `DATABASE_URL`: PostgreSQL connection string.
+  - `NEXT_PUBLIC_CLIENT_ID`: Current client's ID.
+
+- **Authentication:**
+  - `AUTH_SECRET`: Secret key for **Auth.js**.
+  - `AUTH_GOOGLE_ID`: Google OAuth Client ID.
+  - `AUTH_GOOGLE_SECRET`: Google OAuth Client Secret.
+
+- **Firebase:**
+  - `NEXT_PUBLIC_FIREBASE_FCM_VAPID_KEY`: VAPID key for **Firebase FCM**.
+  - `NEXT_PUBLIC_CLIENT_ID`: Public identifier for the specific client.
+  - `NEXT_PUBLIC_FIREBASE_API_KEY`: Firebase API Key.
+  - `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`: Firebase Auth Domain.
+  - `NEXT_PUBLIC_FIREBASE_PROJECT_ID`: Firebase Project ID.
+  - `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`: Firebase Storage Bucket.
+  - `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`: Firebase Messaging Sender ID.
+  - `NEXT_PUBLIC_FIREBASE_APP`: Firebase App Name.
+  - `NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID`: Firebase Measurement ID.
+
+### Example `.env` File:
+
+```env
+DATABASE_URL=your_postgresql_connection_string
+NEXT_PUBLIC_CLIENT_ID=current_client_id
+
+AUTH_SECRET=your_auth_secret_key
+AUTH_GOOGLE_ID=your_google_oauth_client_id
+AUTH_GOOGLE_SECRET=your_google_oauth_client_secret
+
+NEXT_PUBLIC_FIREBASE_FCM_VAPID_KEY=your_firebase_vapid_key
+NEXT_PUBLIC_CLIENT_ID=your_client_id
+NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_firebase_project_id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_firebase_storage_bucket
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_firebase_messaging_sender_id
+NEXT_PUBLIC_FIREBASE_APP=your_firebase_app_name
+NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=your_firebase_measurement_id
+```
+
+## Installation
+
+1. Clone the repository:
    ```bash
    git clone https://github.com/DACS-Digital-Design/Form-Submission-Push-Notifications-Dashboard.git
    cd Form-Submission-Push-Notifications-Dashboard
    ```
 
-2. **Install dependencies**
-
+2. Install dependencies:
    ```bash
    npm install
    ```
 
-3. **Configure Firebase**
+3. Set up your `.env` file with database and Firebase credentials.
 
-   - Create a Firebase project and enable Firebase Cloud Messaging (FCM).
-   - Follow this [tutorial](https://github.com/Dulajdeshan/nextjs-firebase-messaging) for setting up FCM with your Next.js app.
-   - Download your `firebase-config.json` and add it to your project directory (or wherever your Firebase configuration is read from).
-
-4. **Environment Variables**
-
-   create a .env file in the root of the project with the following variable:
-   ```plaintext
-   DATABASE_URL="your_database_url"
-   ```
-
-
-   Create a `.env.local` file in the root of the project with the following variables:
-
-   ```plaintext
-   AUTH_SECRET="your_authjs_secret"
-
-   NEXT_PUBLIC_FIREBASE_API_KEY="your_firebase_api_key"
-   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN="your_firebase_auth_domain"
-   NEXT_PUBLIC_FIREBASE_DATABASE_URL="your_firebase_database_url"
-   NEXT_PUBLIC_FIREBASE_PROJECT_ID="your_firebase_project_id"
-   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET="your_firebase_storage_bucket"
-   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID="your_firebase_messaging_sender_id"
-   NEXT_PUBLIC_FIREBASE_APP="your_firebase_app_id"
-   NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID="your_firebase_measurement_id"
-
-   MY_EMAILS='stringified_array_of_emails'
-   ```
-   Note that in an effort to avoid leaking my own keys and data I've taken some weird measures for hiding some keys. In this example, the ```MY_EMAILS``` will be parsed and compared for the authentication process, but you can implement whatever auth logic you want.
-
-5. **Set Up Prisma**
-
-   Generate your Prisma client and run migrations:
-
+4. Run database migrations:
    ```bash
-   npx prisma generate
-   npx prisma db push
+   npx prisma migrate dev
    ```
 
-6. **Run the Development Server**
-
+5. Start the development server:
    ```bash
    npm run dev
    ```
 
-   Visit [https://localhost:3000](https://localhost:3000) in your browser to view the app.
+## Firebase FCM Setup
 
-### How the FCM Integration Works
+This project’s Firebase Cloud Messaging setup was inspired by a [tutorial repository](https://github.com/Dulajdeshan/nextjs-firebase-messaging). Refer to it for detailed instructions on configuring FCM for notifications.
 
-Whenever a website request is submitted via the app, it triggers a Firebase Cloud Messaging (FCM) notification to all registered devices. For setting up the FCM messaging system, I followed this [GitHub tutorial](https://github.com/Dulajdeshan/nextjs-firebase-messaging), which provides a solid foundation for integrating push notifications into a Next.js app.
+## Contributions
 
-Below is a code block from my personal website which triggers the push notifications:
-```typescript
-import { MulticastMessage } from "firebase-admin/messaging";
-import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/prisma/client";
-import admin from "firebase-admin";
+Feel free to submit pull requests or open issues to suggest improvements.
 
-// Initialize Firebase Admin SDK
-if (!admin.apps.length) {
-  const serviceAccount = require("@/service_key.json");
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-  });
-}
+## License
 
-export async function POST(req: NextRequest) {
-  const data = await req.json();
-
-  const title = "New Contact Form Submission";
-  const body = `Name: ${data.first_name + " " + data.last_name}\nEmail: ${data.email}\nProject Info: ${data.project_info}`;
-  const link = "https://your-instance-url.com/";
-
-  try {
-    await prisma.contact.create({ data });
-
-    const tokens = await prisma.fCMToken.findMany({
-      where: { active: true }
-    })
-    const payload: MulticastMessage = {
-      tokens: tokens.map((t) => t.token),
-      notification: {
-        title,
-        body,
-      },
-      data: {
-        title,
-        body,
-        link,
-      },
-      webpush: link && {
-        fcmOptions: {
-          link,
-        },
-      },
-      android: {
-        notification: {
-          icon: "/graphic.webp",
-          priority: 'max',
-          visibility: 'public',
-        }
-      }
-    };
-
-    await admin.messaging().sendEachForMulticast(payload);
-
-    // Revalidate the contact form page
-    fetch('https://your-instance-url.com/api/revalidate')
-
-    return NextResponse.json({
-      success: true,
-      message: "Message sent!", 
-    }, {
-      status: 200,
-      statusText: "OK",
-    });
-  } catch (error) {
-    return NextResponse.json({ success: false, error });
-  }
-}
-```
-
-
-This will upload the contact form data to your database, then send your registered devices a push notification. Everything should be visible from the dashboard.
-
-### Deployment
-
-For deployment, you can use Vercel, Heroku, or any other platform that supports Node.js. Make sure to add all required environment variables on your hosting platform for Firebase, database URL, and other configurations.
-
-## Contributing
-
-Feel free to fork this repo and create a pull request if you have suggestions or improvements. 
+This project is open-source and available under the MIT License.

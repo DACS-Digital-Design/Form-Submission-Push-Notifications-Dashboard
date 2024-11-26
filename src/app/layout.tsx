@@ -6,8 +6,8 @@ import { auth } from '@/auth';
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "DACS Form Panel",
-  description: "DACS Digital Design contact form viewer",
+  title: "Form Panel",
+  description: "Contact form Viewer",
 };
 
 export default async function RootLayout({

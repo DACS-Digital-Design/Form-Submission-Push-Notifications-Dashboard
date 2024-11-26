@@ -1,13 +1,12 @@
 "use client"
 
-import { checkTokenEnabled, fetchContacts, fetchNotifications, fetchReviews } from "@/lib/db-utils";
+import { checkTokenEnabled, fetchContacts, fetchNotifications } from "@/lib/db-utils";
 import { createContext, ReactNode, useEffect, useState } from "react";
-import { Contact, Review } from "@/app/page";
-import type { Notification } from "@/lib/db-utils";
+import type { ContactEntry, Notification } from "@/lib/db-utils";
+import { db, defaultSettings, Settings } from "@/db";
 import { ThemeProvider } from "next-themes";
 import { fetchToken } from "@/firebase";
 import { Session } from "next-auth";
-import { db, defaultSettings, Settings } from "@/db";
 
 export const ProviderContext = createContext({
   notifications: [{
@@ -19,31 +18,16 @@ export const ProviderContext = createContext({
   } as Notification],
   contacts: [{
     id: "",
-    first_name: "",
-    last_name: "",
+    name: "",
     email: "",
-    phone_number: "",
-    project_info: "",
-    objective: "fresh",
+    phone: "",
+    message: "",
     archived: false,
     read_at: new Date(),
     created_at: new Date(),
     updated_at: new Date(),
-  } as Contact],
-  reviews: [{
-    id: "",
-    business_name: "",
-    website_type: "",
-    rating: 0,
-    summary: "",
-    favorite_feature: "",
-    improvements: "",
-    archived: false,
-    read_at: new Date(),
-    created_at: new Date(),
-    updated_at: new Date(),
-  } as Review],
-  fetchData: async (dataToFetch: ("notifications" | "contacts" | "reviews"| "settings" | "token")[] | "all" ) => {},
+  } as ContactEntry],
+  fetchData: async (dataToFetch: ("notifications" | "contacts" | "settings" | "token")[] | "all" ) => {},
   settings: defaultSettings,
   loading: true,
   session: null as Session | null,
@@ -54,14 +38,14 @@ export const Provider = ({ children, session }: { children: ReactNode, session: 
 
   const [settings, setSettings] = useState<Settings>(defaultSettings);
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [contacts, setContacts] = useState<Contact[]>([]);
-  const [reviews, setReviews] = useState<Review[]>([]);
+  const [contacts, setContacts] = useState<ContactEntry[]>([]);
 
   useEffect(() => {
     (async() => {
       setLoading(true);
 
       setSettings(await db.getSettings())
+      setNotifications(await fetchNotifications());
 
       setLoading(false);
     })()
@@ -71,7 +55,7 @@ export const Provider = ({ children, session }: { children: ReactNode, session: 
     uploadToken()
   }, [session, settings.token])
 
-  const fetchData = async ( dataToFetch: ("notifications" | "contacts" | "reviews"| "settings" | "token")[] | "all" ) => {
+  const fetchData = async ( dataToFetch: ("notifications" | "contacts" | "settings" | "token")[] | "all" ) => {
     setLoading(true);
 
     if (dataToFetch === "all" || dataToFetch.includes("notifications")) {
@@ -79,9 +63,6 @@ export const Provider = ({ children, session }: { children: ReactNode, session: 
     }
     if (dataToFetch === "all" || dataToFetch.includes("contacts")) {
       setContacts(await fetchContacts());
-    }
-    if (dataToFetch === "all" || dataToFetch.includes("reviews")) {
-      setReviews(await fetchReviews());
     }
     if (dataToFetch === "all" || dataToFetch.includes("settings")) {
       setSettings(await db.getSettings())
@@ -112,7 +93,6 @@ export const Provider = ({ children, session }: { children: ReactNode, session: 
       value={{
         notifications,
         contacts,
-        reviews,
         fetchData,
         settings,
         loading,

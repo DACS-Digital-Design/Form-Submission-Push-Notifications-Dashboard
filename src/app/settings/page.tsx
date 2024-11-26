@@ -1,10 +1,10 @@
 "use client"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { togglePushNotifications } from "@/lib/db-utils";
 import { useContext, useEffect, useState } from "react";
 import { ProviderContext } from "@/components/provider";
 import { Skeleton } from "@/components/ui/skeleton";
-import { togglePushNotifications } from "@/lib/db-utils";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Bell, Moon, Sun } from "lucide-react";
