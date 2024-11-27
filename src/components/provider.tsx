@@ -62,8 +62,14 @@ export const Provider = ({ children, session }: { children: ReactNode, session: 
       setNotifications(await fetchNotifications());
     }
     if (dataToFetch === "all" || dataToFetch.includes("contacts")) {
-      // Fetch data from the database, if empty, fetch cached data from IndexedDB
-      let data = await fetchContacts()
+      // Fetch data from the database, if DB empty or offline, fetch cached data from IndexedDB
+      let data: ContactEntry[] = [];
+      try {
+        data = await fetchContacts()
+      } catch (error) {
+        console.info(error);
+      }
+
       if (data.length === 0) data = (await db.getSettings()).entries
 
       // Set the contacts state only if data is not empty
