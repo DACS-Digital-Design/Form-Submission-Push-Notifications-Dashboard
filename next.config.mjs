@@ -3,6 +3,11 @@ import withPWAInit from "@ducanh2912/next-pwa";
 
 const withPWA = withPWAInit({
   dest: "public",
+  cacheOnFrontEndNav: true,
+  cacheStartUrl: true,
+  dynamicStartUrl: true,
+  dynamicStartUrlRedirect: '/api/auth/signin',
+  reloadOnOnline: true,
 });
 
 export default withPWA({

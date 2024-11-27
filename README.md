@@ -160,6 +160,33 @@ This file contains Firebase service account credentials for server-side operatio
 
 ---
 
+### Service Worker Configuration
+
+The Firebase configuration must also be **manually filled out** in the `firebase-messaging-sw.js` file located in the `public/` directory. This is because **environment variables cannot be used in service workers**. The file should look something like this:
+
+```/javascript
+importScripts("https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js");
+importScripts(
+  "https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js"
+);
+
+const firebaseConfig = {
+  "apiKey": "",
+  "authDomain": "",
+  "projectId": "",
+  "storageBucket": "",
+  "messagingSenderId": "",
+  "appId": "",
+  "measurementId": "",
+}
+
+...
+```
+
+Be sure to replace the placeholder strings with your actual Firebase configuration details.
+
+---
+
 ### How to Obtain These Files
 
 For detailed steps to generate these files, refer to:

@@ -2,7 +2,16 @@ importScripts("https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js");
 importScripts(
   "https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js"
 );
-import firebaseConfig from '../firebase-config.json';
+
+const firebaseConfig = {
+  "apiKey": "",
+  "authDomain": "",
+  "projectId": "",
+  "storageBucket": "",
+  "messagingSenderId": "",
+  "appId": "",
+  "measurementId": "",
+}
 
 // Replace these with your own Firebase config keys...
 firebase.initializeApp(firebaseConfig);
