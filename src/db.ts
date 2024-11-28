@@ -1,5 +1,5 @@
-import Dexie, { Table } from 'dexie';
 import { ContactEntry } from './lib/db-utils';
+import Dexie, { Table } from 'dexie';
 
 // Define the type for settings
 export type Settings = {

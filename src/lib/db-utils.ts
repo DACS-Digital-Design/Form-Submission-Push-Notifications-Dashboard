@@ -1,6 +1,7 @@
 "use server"
 
 import prisma from "@/prisma/client";
+import { parseToNotifications } from "./utils";
 
 type basicEntry = {
   id: string
@@ -34,17 +35,30 @@ const parseContacts = (contacts: (basicEntry & { content: string })[]) => {
   }) as ContactEntry[]
 }
 
-export const fetchContacts = async (): Promise<ContactEntry[]> => {
+export const fetchContacts = async ({ index = 0, amount = 10 }: { index?: number, amount?: number }): Promise<ContactEntry[]> => {
   try {
     return parseContacts(await prisma.entry.findMany({
       where: {
         client_id: process.env.NEXT_PUBLIC_CLIENT_ID as string
-      }
+      },
+      orderBy: {
+        created_at: 'desc'
+      },
+      skip: index,
+      take: amount
     }))
   } catch (error) {
     console.error(await error);
     return []
   }
+}
+
+export const getContactCount = async () => {
+  return await prisma.entry.count({
+    where: {
+      client_id: process.env.NEXT_PUBLIC_CLIENT_ID as string
+    }
+  })
 }
 
 export const archiveContacts = async (entryIDs: string[], archived: boolean) => {
@@ -87,17 +101,8 @@ export const fetchNotifications = async () => {
     },
     take: 10
   }))
-  contacts.forEach((contact) => {
-    notifs.push({
-      id: contact.id,
-      name: contact.name,
-      type: "contact",
-      created_at: contact.created_at,
-      read_at: contact.read_at
-    } as Notification)
-  })
 
-  return notifs.sort((a, b) => b.created_at.getTime() - a.created_at.getTime())
+  return parseToNotifications(contacts).sort((a, b) => b.created_at.getTime() - a.created_at.getTime())
 }
 
 export const toggleEntryRead = async ( id: string, markAsRead: boolean ) => {

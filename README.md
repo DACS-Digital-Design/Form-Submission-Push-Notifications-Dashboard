@@ -79,6 +79,8 @@ The **Form Viewer PWA Template** is tailored for freelancers who manage websites
 
 3. **Data Display:**
    - The frontend parses and displays form entries dynamically for easy viewing and management.
+   - These entries are cached in the client's IndexedDB, with newer items fetched from the database as needed.
+   - These cached entries are also used for the PWA's offline mode.
 
 4. **Notifications:**
    - Using Firebase Cloud Messaging (FCM), push notifications alert you to new submissions.

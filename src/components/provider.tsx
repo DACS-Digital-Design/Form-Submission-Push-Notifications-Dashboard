@@ -1,12 +1,13 @@
 "use client"
 
-import { checkTokenEnabled, fetchContacts, fetchNotifications } from "@/lib/db-utils";
+import { checkTokenEnabled, fetchContacts, fetchNotifications, getContactCount } from "@/lib/db-utils";
 import { createContext, ReactNode, useEffect, useState } from "react";
 import type { ContactEntry, Notification } from "@/lib/db-utils";
 import { db, defaultSettings, Settings } from "@/db";
 import { ThemeProvider } from "next-themes";
 import { fetchToken } from "@/firebase";
 import { Session } from "next-auth";
+import { parseToNotifications } from "@/lib/utils";
 
 export const ProviderContext = createContext({
   notifications: [{
@@ -59,23 +60,45 @@ export const Provider = ({ children, session }: { children: ReactNode, session: 
     setLoading(true);
 
     if (dataToFetch === "all" || dataToFetch.includes("notifications")) {
-      setNotifications(await fetchNotifications());
+      try {
+        setNotifications(await fetchNotifications());
+      } catch (error) {
+        setNotifications(
+          parseToNotifications(
+            (await db.getSettings()).entries.slice(0, 10)
+          )
+        )
+      }
     }
     if (dataToFetch === "all" || dataToFetch.includes("contacts")) {
-      // Fetch data from the database, if DB empty or offline, fetch cached data from IndexedDB
+      // Workflow:
+      // 1. Fetch data from IndexedDB
+      // 2. Fetch any new data from the database
+      // 3. Update the IndexedDB with the new data
+      // 4. Set the state with the new data
       let data: ContactEntry[] = [];
+      let newContactsCount: number = 0;
+
+      data.push(...((await db.getSettings()).entries))
+
       try {
-        data = await fetchContacts()
+        newContactsCount = await getContactCount() - data.length;
       } catch (error) {
-        console.info(error);
+        console.info(await error);
+      }
+      
+      if (newContactsCount > 0) {
+        // Try-Catch block to handle any errors that may occur during the fetch
+        // Specifically, if the user is offline, the fetch will fail
+        try {
+          const newContacts = await fetchContacts({ index: data.length, amount: newContactsCount });
+          data.push(...newContacts)
+          await db.updateSettings({ entries: data });
+        } catch (error) {
+          console.info(await error);
+        }
       }
 
-      if (data.length === 0) data = (await db.getSettings()).entries
-
-      // Set the contacts state only if data is not empty
-      if (data.length > 0) await db.updateSettings({ entries: data });
-      
-      // Return the data to the state
       setContacts(data);
     }
     if (dataToFetch === "all" || dataToFetch.includes("settings")) {
