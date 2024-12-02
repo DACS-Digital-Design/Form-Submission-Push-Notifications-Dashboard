@@ -48,7 +48,7 @@ export const fetchContacts = async ({ index = 0, amount = 10 }: { index?: number
       take: amount
     }))
   } catch (error) {
-    console.error(await error);
+    console.info("DB-Utils Fetch Contacts: ", await error);
     return []
   }
 }
@@ -77,7 +77,7 @@ export const archiveContacts = async (entryIDs: string[], archived: boolean) => 
 
     return true;
   } catch (error) {
-    console.error(false);
+    console.info("DB-Utils Fetch Contacts: ", await error);
     return false;
   }
 }
@@ -90,8 +90,6 @@ export type Notification = {
 }
 
 export const fetchNotifications = async () => {
-  const notifs: Notification[] = []
-
   const contacts = parseContacts(await prisma.entry.findMany({
     where: {
       client_id: process.env.NEXT_PUBLIC_CLIENT_ID as string,

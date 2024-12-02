@@ -4,10 +4,10 @@ import { checkTokenEnabled, fetchContacts, fetchNotifications, getContactCount }
 import { createContext, ReactNode, useEffect, useState } from "react";
 import type { ContactEntry, Notification } from "@/lib/db-utils";
 import { db, defaultSettings, Settings } from "@/db";
+import { parseToNotifications } from "@/lib/utils";
 import { ThemeProvider } from "next-themes";
 import { fetchToken } from "@/firebase";
 import { Session } from "next-auth";
-import { parseToNotifications } from "@/lib/utils";
 
 export const ProviderContext = createContext({
   notifications: [{
@@ -46,7 +46,7 @@ export const Provider = ({ children, session }: { children: ReactNode, session: 
       setLoading(true);
 
       setSettings(await db.getSettings())
-      setNotifications(await fetchNotifications());
+      await fetchData(['notifications'])
 
       setLoading(false);
     })()
@@ -84,7 +84,7 @@ export const Provider = ({ children, session }: { children: ReactNode, session: 
       try {
         newContactsCount = await getContactCount() - data.length;
       } catch (error) {
-        console.info(await error);
+        console.info("Provider Contacts Count: ", await error);
       }
       
       if (newContactsCount > 0) {
@@ -95,7 +95,7 @@ export const Provider = ({ children, session }: { children: ReactNode, session: 
           data.push(...newContacts)
           await db.updateSettings({ entries: data });
         } catch (error) {
-          console.info(await error);
+          console.info("Provider Contacts Update: ", await error);
         }
       }
 

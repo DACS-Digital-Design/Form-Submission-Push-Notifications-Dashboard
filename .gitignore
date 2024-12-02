@@ -31,8 +31,10 @@ yarn-error.log*
 
 # Not sure if these are safe to push or not so imma leave them out and let them out generate
 public/sw.js
+public/sw.js.map
 public/swe-worker-*.js
 public/workbox-*.js
+public/workbox-*.js.map
 
 # local env files
 .env*.local
