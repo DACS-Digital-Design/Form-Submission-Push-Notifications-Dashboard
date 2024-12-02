@@ -119,10 +119,14 @@ export const Provider = ({ children, session }: { children: ReactNode, session: 
     if (Notification.permission === 'granted') {
       if (!settings.token) return fetchData(['token', 'settings']);
 
-      fetch('/api/upload-token', {
-        method: 'POST',
-        body: JSON.stringify({ token: settings.token, email: session?.user?.email }),
-      })
+      try {
+        await fetch('/api/upload-token', {
+          method: 'POST',
+          body: JSON.stringify({ token: settings.token, email: session?.user?.email }),
+        })
+      } catch (error) {
+        console.info("Uploading Token: ", await error)
+      }
     }
   }
 
