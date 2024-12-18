@@ -65,7 +65,9 @@ export const Provider = ({ children, session }: { children: ReactNode, session: 
       } catch (error) {
         setNotifications(
           parseToNotifications(
-            (await db.getSettings()).entries.slice(0, 10)
+            (await db.getSettings()).entries
+              .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+              .slice(0, 10)
           )
         )
       }

@@ -19,41 +19,44 @@ const normalizeName = (name: string) => {
 const SettingsPage = () => {
   const { fetchData, settings, loading } = useContext(ProviderContext);
   const { session } = useContext(ProviderContext);
-  const [ loadingState, setLoadingState ] = useState(true);
+  
   const { setTheme } = useTheme();
   
   useEffect(() => {
     fetchData(['token', 'settings'])
-    setLoadingState(false)
   }, [])
 
 
   return (
     <>
       <header className="sticky top-0 z-10 bg-background border-b border-border shadow-sm">
-        <h1 className="text-lg font-bold container p-2 transition-all">Dashboard</h1>
+        <h1 className="text-lg font-bold container p-2 transition-all">Settings</h1>
       </header>
       
       <main className="flex-grow p-2 transition-all overflow-y-auto container flex flex-col gap-4 mt-2">
-        <Card className="grid grid-cols-[4.5rem_1fr] p-4 items-center">
-          {session ? (
-            <>
-              <Avatar className="row-span-2 size-16">
-                <AvatarImage src={session?.user?.image ?? ""} alt="" className="size-16"/>
-                <AvatarFallback className="bg-accent text-accent-contrast size-16 text-2xl mr-2">{normalizeName((session?.user?.name ?? session?.user?.email) as string)}D</AvatarFallback>
-              </Avatar>
-              <span className="font-bold text-xl">{session?.user?.name}</span>
-              <span className="text-foreground/50">{session?.user?.email}</span>
-            </>
-          ) : (
-            <>
-              <Skeleton className="row-span-2 size-16 rounded-full" />
+      <Card className="grid grid-cols-[4.5rem_1fr] p-4 items-center overflow-ellipsis">
+        {session ? (
+          <>
+            <Avatar className="row-span-2 size-16">
+              <AvatarImage src={session?.user?.image ?? ""} alt="" className="size-16"/>
+              <AvatarFallback className="bg-accent text-accent-contrast size-16 text-2xl mr-2">
+                {normalizeName((session?.user?.name ?? session?.user?.email) as string)}
+              </AvatarFallback>
+            </Avatar>
+            <span className="font-bold text-xl text-ellipsis overflow-hidden whitespace-nowrap">{session?.user?.name}</span>
+            <div className="text-foreground/50 text-ellipsis overflow-hidden whitespace-nowrap">
+              {session?.user?.email}
+            </div>
+          </>
+        ) : (
+          <>
+            <Skeleton className="row-span-2 size-16 rounded-full" />
+            <Skeleton className="h-[28px] w-20" />
+            <Skeleton className="h-[20px] w-40" />
+          </>
+        )}
+      </Card>
 
-              <Skeleton className="h-[28px] w-20" />
-              <Skeleton className="h-[20px] w-40" />
-            </>
-          )}
-        </Card>
 
         <Card className="mb-3">
           <CardHeader className="p-3">
@@ -63,11 +66,10 @@ const SettingsPage = () => {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  {(settings.theme === 'dark') ? <Moon className="size-4" /> : <Sun className="size-4" />}
+                  <Moon className="size-4" />
                   <span className="text-sm font-medium">Dark Mode</span>
                 </div>
                 <Switch
-                  disabled={loadingState}
                   checked={loading ? false : settings.theme === 'dark'}
                   onCheckedChange={async() => {
                     setTheme(settings.theme === 'dark' ? 'light' : 'dark')
@@ -86,9 +88,14 @@ const SettingsPage = () => {
                   disabled={loading || !session || !settings.token}
                   checked={(!session || !settings.token) ? false : settings.notificationsEnabled}
                   onCheckedChange={async() => {
-                    await togglePushNotifications(!settings.notificationsEnabled, settings.token as string)
-                    await db.updateSettings({ notificationsEnabled: !settings.notificationsEnabled })
-                    fetchData(['settings'])
+                    try {
+                      await togglePushNotifications(!settings.notificationsEnabled, settings.token as string)
+                      await db.updateSettings({ notificationsEnabled: !settings.notificationsEnabled })
+                      fetchData(['settings'])
+                    } catch (error) {
+                      console.log(`${settings.notificationsEnabled ? 'Disabling' : 'Enabling'} notifications:`, await error)
+                      return false
+                    }
                   }}
                   aria-label="Toggle notifications"
                 />

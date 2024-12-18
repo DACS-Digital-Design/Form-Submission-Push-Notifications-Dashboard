@@ -136,16 +136,21 @@ export default function HomePage() {
               <CardContent className="p-3 pt-0">
                 <p className="mb-2 text-sm">{contact.message}</p>
                 <div className="flex items-center justify-between gap-4">
-                  <p className="text-font-semiboldd mt-2">Created: {formatDate(contact.created_at)}</p>
+                  <span className="text-xs text-gray-500">Created: {formatDate(contact.created_at)}</span>
         
                   <LoadingButton
                     variant="outline"
                     size="sm"
                     className="font-semibold"
                     onClick={async () => {
-                      await archiveContacts([contact.id], !contact.archived)
-                      fetchData(['contacts'])
-                      return true
+                      try {
+                        await archiveContacts([contact.id], !contact.archived)
+                        fetchData(['contacts'])
+                        return true
+                      } catch (error) {
+                        console.log(`Set ${contact.id} as ${contact.archived ? 'unarchived' : 'archived'}:`, await error)
+                        return false
+                      }
                     }}
                   >
                     {contact.archived ? <ArchiveRestore className="h-4 w-4 mr-1" /> : <Archive className="h-4 w-4 mr-1" />}

@@ -40,9 +40,14 @@ const NotificationsPage = () => {
             className="bg-white/5 border-white/10 h-7"
             disabled={unreadCount === 0}
             onClick={async() => {
-              await markAllAsRead()
-              fetchData(['notifications'])
-              return true
+              try {
+                await markAllAsRead()
+                fetchData(['notifications'])
+                return true
+              } catch (error) {
+                console.log("Marking all items as read:", await error)
+                return false
+              }
             }}
           >
             Mark all as read
@@ -81,9 +86,14 @@ const NotificationsPage = () => {
                     size="sm"
                     className="h-6 text-xs"
                     onClick={async () => {
-                      await toggleEntryRead( notification.id, !notification.read_at )
-                      fetchData(['notifications'])
-                      return true
+                      try {
+                        await toggleEntryRead( notification.id, !notification.read_at )
+                        fetchData(['notifications'])
+                        return true
+                      } catch (error) {
+                        console.log(`Marking ${notification.id} as ${!notification.read_at ? 'read' : 'unread'}:`, await error)
+                        return false
+                      }
                     }}
                   >
                     <Check className="h-3 w-3 mr-1" /> Mark as {!!notification.read_at && 'un'}read
